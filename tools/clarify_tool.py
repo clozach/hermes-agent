@@ -15,11 +15,6 @@ import json
 from typing import List, Optional, Callable
 
 
-# Maximum number of predefined choices the agent can offer.
-# A 5th "Other (type your answer)" option is always appended by the UI.
-MAX_CHOICES = 4
-
-
 def clarify_tool(
     question: str,
     choices: Optional[List[str]] = None,
@@ -30,8 +25,9 @@ def clarify_tool(
 
     Args:
         question: The question text to present.
-        choices:  Up to 4 predefined answer choices. When omitted the
-                  question is purely open-ended.
+        choices:  Predefined answer choices. When omitted the question is
+                  purely open-ended. An 'Other (type your answer)' option is
+                  always appended by the UI.
         callback: Platform-provided function that handles the actual UI
                   interaction. Signature: callback(question, choices) -> str.
                   Injected by the agent runner (cli.py / gateway).
@@ -44,13 +40,10 @@ def clarify_tool(
 
     question = question.strip()
 
-    # Validate and trim choices
     if choices is not None:
         if not isinstance(choices, list):
             return tool_error("choices must be a list of strings.")
         choices = [str(c).strip() for c in choices if str(c).strip()]
-        if len(choices) > MAX_CHOICES:
-            choices = choices[:MAX_CHOICES]
         if not choices:
             choices = None  # empty list → open-ended
 
@@ -89,8 +82,8 @@ CLARIFY_SCHEMA = {
     "description": (
         "Ask the user a question when you need clarification, feedback, or a "
         "decision before proceeding. Supports two modes:\n\n"
-        "1. **Multiple choice** — provide up to 4 choices. The user picks one "
-        "or types their own answer via a 5th 'Other' option.\n"
+        "1. **Multiple choice** — provide a list of choices. The user picks "
+        "one or types their own answer via an appended 'Other' option.\n"
         "2. **Open-ended** — omit choices entirely. The user types a free-form "
         "response.\n\n"
         "Use this tool when:\n"
@@ -112,11 +105,10 @@ CLARIFY_SCHEMA = {
             "choices": {
                 "type": "array",
                 "items": {"type": "string"},
-                "maxItems": MAX_CHOICES,
                 "description": (
-                    "Up to 4 answer choices. Omit this parameter entirely to "
-                    "ask an open-ended question. When provided, the UI "
-                    "automatically appends an 'Other (type your answer)' option."
+                    "Answer choices. Omit this parameter entirely to ask an "
+                    "open-ended question. When provided, the UI automatically "
+                    "appends an 'Other (type your answer)' option."
                 ),
             },
         },

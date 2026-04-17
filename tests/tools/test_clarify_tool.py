@@ -8,7 +8,6 @@ import pytest
 from tools.clarify_tool import (
     clarify_tool,
     check_clarify_requirements,
-    MAX_CHOICES,
     CLARIFY_SCHEMA,
 )
 
@@ -65,8 +64,8 @@ class TestClarifyToolBasics:
 class TestClarifyToolChoicesValidation:
     """Tests for choices parameter validation."""
 
-    def test_choices_trimmed_to_max(self):
-        """Should trim choices to MAX_CHOICES."""
+    def test_many_choices_passed_through(self):
+        """All choices should pass through — no cap on list length."""
         choices_passed = []
 
         def mock_callback(question: str, choices: Optional[List[str]]) -> str:
@@ -76,7 +75,7 @@ class TestClarifyToolChoicesValidation:
         many_choices = ["a", "b", "c", "d", "e", "f", "g"]
         clarify_tool("Pick one", choices=many_choices, callback=mock_callback)
 
-        assert len(choices_passed) == MAX_CHOICES
+        assert choices_passed == many_choices
 
     def test_empty_choices_become_none(self):
         """Empty choices list should become None (open-ended)."""
@@ -185,11 +184,7 @@ class TestClarifySchema:
         """Choices parameter should be optional."""
         assert "choices" not in CLARIFY_SCHEMA["parameters"]["required"]
 
-    def test_schema_choices_max_items(self):
-        """Schema should specify max items for choices."""
+    def test_schema_choices_no_max_items(self):
+        """Schema should not cap the number of choices."""
         choices_spec = CLARIFY_SCHEMA["parameters"]["properties"]["choices"]
-        assert choices_spec.get("maxItems") == MAX_CHOICES
-
-    def test_max_choices_is_four(self):
-        """MAX_CHOICES constant should be 4."""
-        assert MAX_CHOICES == 4
+        assert "maxItems" not in choices_spec
