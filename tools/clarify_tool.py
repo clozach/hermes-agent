@@ -90,10 +90,15 @@ CLARIFY_SCHEMA = {
         "- The task is ambiguous and you need the user to choose an approach\n"
         "- You want post-task feedback ('How did that work out?')\n"
         "- You want to offer to save a skill or update memory\n"
-        "- A decision has meaningful trade-offs the user should weigh in on\n\n"
+        "- A decision has meaningful trade-offs the user should weigh in on\n"
+        "- **A skill instructs you to render a menu or picker.** Skill-driven "
+        "pickers use this tool so the user gets arrow-key navigation; call "
+        "`clarify` with the choices the skill defines, even if the decision "
+        "itself is routine.\n\n"
         "Do NOT use this tool for simple yes/no confirmation of dangerous "
-        "commands (the terminal tool handles that). Prefer making a reasonable "
-        "default choice yourself when the decision is low-stakes."
+        "commands (the terminal tool handles that). Outside of skill-directed "
+        "pickers, prefer making a reasonable default choice yourself when the "
+        "decision is low-stakes."
     ),
     "parameters": {
         "type": "object",
